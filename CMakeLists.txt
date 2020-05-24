@@ -9,6 +9,7 @@ cmake_policy(SET CMP0048 NEW)  # Tell cmake to use VERSION parameter in project(
 # Options
 set(CMAKE_USER_MAKE_RULES_OVERRIDE "${CMAKE_CURRENT_LIST_DIR}/CMake/Helpers/CompileOptions.cmake")
 option(OPENSSL_ROOT_DIR "OpenSSL Root Directory" "")
+option(BUILD_SHARED_LIBS "Build shared libraries" OFF)
 
 # PROJECT WIDE SETUP
 project(Etterna
