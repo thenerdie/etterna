@@ -13,7 +13,7 @@
 #include "ScreenTextEntry.h"
 #include "Etterna/Singletons/ThemeManager.h"
 #include "Etterna/Singletons/InputFilter.h"
-
+#include "Core/Platform/Platform.hpp"
 
 #include <algorithm>
 #include <utility>
@@ -463,7 +463,7 @@ ScreenTextEntry::Input(const InputEventPlus& input)
 		auto vPressed =
 		  input.DeviceI.button == KEY_CV || input.DeviceI.button == KEY_Cv;
 		if (vPressed && ctrlPressed) {
-			TryAppendToAnswer(Locator::getArchHooks()->GetClipboard());
+			TryAppendToAnswer(Core::Platform::getClipboard());
 
 			TextEnteredDirectly(); // XXX: This doesn't seem appropriate but
 								   // there's no TextPasted()
@@ -555,7 +555,9 @@ ScreenTextEntry::End(bool bCancelled)
 		std::string sError;
 
 		if (!ValidateFunc.IsNil() && ValidateFunc.IsSet()) {
-			ValidateFromLua(sAnswer, sError, ValidateFunc);
+			bool bValidAnswer = ValidateFromLua(sAnswer, sError, ValidateFunc);
+			if (!bValidAnswer)
+				return;
 		} else if (pValidate != nullptr) {
 			bool bValidAnswer = pValidate(sAnswer, sError);
 			if (!bValidAnswer) {

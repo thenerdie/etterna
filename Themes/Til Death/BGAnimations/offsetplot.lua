@@ -254,7 +254,7 @@ o[#o + 1] =
 			local row = convertXToRow(xpos)
 			local judgments = SCREENMAN:GetTopScreen():GetReplaySnapshotJudgmentsForNoterow(row)
 			local wifescore = SCREENMAN:GetTopScreen():GetReplaySnapshotWifePercentForNoterow(row) * 100
-			local timebro = td:GetElapsedTimeFromNoteRow(row)
+			local timebro = td:GetElapsedTimeFromNoteRow(row) / getCurRateValue()
 			local marvCount = judgments[10]
 			local perfCount = judgments[9]
 			local greatCount = judgments[8]
@@ -287,6 +287,8 @@ for i = 1, #fantabars do
 		JudgeDisplayChangedMessageCommand = function(self)
 			self:zoomto(plotWidth + plotMargin, 1):diffuse(byJudgment(bantafars[i])):diffusealpha(baralpha)
 			local fit = tso * fantabars[i]
+			self:finishtweening()
+			self:smooth(0.1)
 			self:y(fitY(fit))
 		end
 	}
@@ -295,6 +297,8 @@ for i = 1, #fantabars do
 		JudgeDisplayChangedMessageCommand = function(self)
 			self:zoomto(plotWidth + plotMargin, 1):diffuse(byJudgment(bantafars[i])):diffusealpha(baralpha)
 			local fit = tso * fantabars[i]
+			self:finishtweening()
+			self:smooth(0.1)
 			self:y(fitY(-fit))
 		end
 	}

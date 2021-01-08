@@ -18,6 +18,9 @@ namespace Core {
 class ILogger {
 
 public:
+    /** Virtual destructor to ensure derived objects are guaranteed to have destructor */
+    virtual ~ILogger() = default;
+
     /**
      * Severity Enum - Middle man between each logging backed
      * and their own severity terminology.
@@ -26,26 +29,24 @@ public:
 
     // Logging Specific
     template <typename... Args> void trace(const std::string_view log, const Args& ... args) {
-        this->log(Severity::TRACE, fmt::format(log, args...));
+		this->log(Severity::TRACE, safe_format(log, args...));
     }
     template <typename... Args> void debug(const std::string_view log, const Args& ... args) {
-        this->log(Severity::DEBUG, fmt::format(log, args...));
+        this->log(Severity::DEBUG, safe_format(log, args...));
     }
     template <typename... Args> void info(const std::string_view log, const Args& ... args) {
-        this->log(Severity::INFO, fmt::format(log, args...));
+        this->log(Severity::INFO, safe_format(log, args...));
     }
     template <typename... Args> void warn(const std::string_view log, const Args& ... args) {
-        this->log(Severity::WARN, fmt::format(log, args...));
+        this->log(Severity::WARN, safe_format(log, args...));
     }
-    template <typename... Args> void error(const std::string_view log, const Args& ... args){
-        this->log(Severity::ERR, fmt::format(log, args...));
+    template <typename... Args> void error(const std::string_view log, const Args& ... args) {
+        this->log(Severity::ERR, safe_format(log, args...));
     }
     template <typename... Args> void fatal(const std::string_view log, const Args& ... args) {
-        this->log(Severity::FATAL, fmt::format(log, args...));
+        this->log(Severity::FATAL, safe_format(log, args...));
     }
 
-    /** @brief Enabled or disable a stdout prompt on Windows */
-    bool setConsoleEnabled(bool enable);
     virtual void setLogLevel(ILogger::Severity logLevel) = 0;
 
 protected:
@@ -58,6 +59,19 @@ protected:
      * @param message Formatted string to log
      */
     virtual void log(ILogger::Severity logLevel, const std::string_view message) = 0;
+
+private:
+	template <typename... Args> inline std::string safe_format(const std::string_view log, const Args& ... args) {
+		try {
+			return fmt::format(log, args...);
+		} catch (fmt::v7::format_error& e) {
+			std::string msg("There was an error formatting the next log "
+							"message - Report to developers: ");
+			msg.append(e.what());
+			this->log(Severity::ERR, msg);
+			return std::string(log);
+		}
+	}
 };
 }
 
